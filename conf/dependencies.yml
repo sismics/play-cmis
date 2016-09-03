@@ -1,0 +1,6 @@
+self: play -> cmis 0.1
+
+require:
+    - play
+    - org.apache.chemistry.opencmis -> chemistry-opencmis-client-impl 0.8.0
+    - com.google.guava -> guava 19.0

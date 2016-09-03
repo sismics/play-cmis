@@ -1,0 +1,7 @@
+# import these default routes as :
+# *         /               module:cmis
+# ~~~~
+
+GET     /document/print                         Documents.print
+GET     /document/{id}                          Documents.detail
+POST    /document/upload                        Documents.upload
