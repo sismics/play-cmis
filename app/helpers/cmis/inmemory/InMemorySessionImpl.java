@@ -15,6 +15,7 @@ import org.apache.chemistry.opencmis.commons.exceptions.CmisContentAlreadyExists
 import org.apache.chemistry.opencmis.commons.exceptions.CmisObjectNotFoundException;
 import org.apache.chemistry.opencmis.commons.spi.CmisBinding;
 import play.Logger;
+import play.test.Fixtures;
 
 import java.math.BigInteger;
 import java.util.*;
@@ -22,32 +23,23 @@ import java.util.*;
 /**
  * CMIS session that persists documents to temporary files, and keeps all metadata in memory.
  * Warning: not thread safe!
- * All docs are lost on Play server restart!
  *
  * @author jtremeaux
  */
 public class InMemorySessionImpl implements Session {
-    /**
-     * Folder structure for all documents indexed by full path.
-     */
-    private static Map<String, CmisObject> objectByPathMap;
-
-    /**
-     * All documents indexed by UUID.
-     */
-    private static Map<String, CmisObject> objectByIdMap;
-
     private OperationContext defaultContext;
 
     static {
-        Logger.info("Initializing CMIS in-memory repository");
+        if (play.test.Fixtures.idCache.get("objectByPathMap") != null) {
+            Logger.info("Initializing CMIS in-memory repository");
 
-        objectByPathMap = new HashMap<>();
-        objectByIdMap = new HashMap<>();
+            Fixtures.idCache.put("objectByPathMap", new HashMap<String, CmisObject>());
+            Fixtures.idCache.put("objectByIdMap", new HashMap<String, CmisObject>());
 
-        Folder rootFolder = new FolderImpl(null, "/");
-        objectByPathMap.put("/", rootFolder);
-        objectByIdMap.put(rootFolder.getId(), rootFolder);
+            Folder rootFolder = new FolderImpl(null, "/");
+            getObjectByPathMap().put("/", rootFolder);
+            getObjectByIdMap().put(rootFolder.getId(), rootFolder);
+        }
     }
 
     public InMemorySessionImpl() {
@@ -125,7 +117,7 @@ public class InMemorySessionImpl implements Session {
 
     @Override
     public Folder getRootFolder(OperationContext context) {
-        return (Folder) objectByPathMap.get("/");
+        return (Folder) getObjectByPathMap().get("/");
     }
 
     @Override
@@ -150,7 +142,7 @@ public class InMemorySessionImpl implements Session {
 
     @Override
     public CmisObject getObject(String objectId) {
-        CmisObject object = objectByIdMap.get(objectId);
+        CmisObject object = getObjectByIdMap().get(objectId);
         if (object == null) {
             throw new CmisObjectNotFoundException("Object not found: " + objectId);
         }
@@ -164,7 +156,7 @@ public class InMemorySessionImpl implements Session {
 
     @Override
     public CmisObject getObjectByPath(String path) {
-        CmisObject object = objectByPathMap.get(path);
+        CmisObject object = getObjectByPathMap().get(path);
         if (object == null) {
             throw new CmisObjectNotFoundException("Object not found: " + path);
         }
@@ -228,7 +220,7 @@ public class InMemorySessionImpl implements Session {
         DocumentImpl document = new DocumentImpl(name, folder.getId());
 
         for (String path : document.getPaths()) {
-            if (objectByPathMap.containsKey(path)) {
+            if (getObjectByPathMap().containsKey(path)) {
                 throw new CmisContentAlreadyExistsException("Folder " + folder.getPath() + " already contains a document with name " + name);
             }
         }
@@ -237,9 +229,9 @@ public class InMemorySessionImpl implements Session {
             document.setContentStream(contentStream, true);
         }
 
-        objectByIdMap.put(document.getId(), document);
+        getObjectByIdMap().put(document.getId(), document);
         for (String path : document.getPaths()) {
-            objectByPathMap.put(path, document);
+            getObjectByPathMap().put(path, document);
         }
 
         return createObjectId(document.getId());
@@ -298,10 +290,10 @@ public class InMemorySessionImpl implements Session {
     @Override
     public void delete(ObjectId objectId, boolean allVersions) {
         CmisObject object = getObject(objectId);
-        objectByIdMap.put(object.getId(), null);
+        getObjectByIdMap().put(object.getId(), null);
         if (object instanceof FileableCmisObject) {
             for (String path : ((FileableCmisObject) object).getPaths()) {
-                objectByPathMap.remove(path);
+                getObjectByPathMap().remove(path);
             }
         }
         if (object instanceof Document) {
@@ -325,7 +317,7 @@ public class InMemorySessionImpl implements Session {
 
     @Override
     public Acl getAcl(ObjectId objectId, boolean onlyBasicPermissions) {
-        return null;  
+        return null;
     }
 
     @Override
@@ -346,5 +338,15 @@ public class InMemorySessionImpl implements Session {
     @Override
     public void removePolicy(ObjectId objectId, ObjectId... policyIds) {
         throw new RuntimeException("not implemented");
+    }
+
+    @SuppressWarnings("unchecked")
+    private static HashMap<String, CmisObject> getObjectByPathMap() {
+        return (HashMap<String, CmisObject>) Fixtures.idCache.get("objectByPathMap");
+    }
+
+    @SuppressWarnings("unchecked")
+    private static HashMap<String, CmisObject> getObjectByIdMap() {
+        return (HashMap<String, CmisObject>) Fixtures.idCache.get("objectByIdMap");
     }
 }

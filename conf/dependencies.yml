@@ -1,4 +1,4 @@
-self: play -> cmis 0.1
+self: play -> cmis 0.2
 
 require:
     - play
