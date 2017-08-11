@@ -10,7 +10,7 @@ This plugin adds [CMIS](https://en.wikipedia.org/wiki/Content_Management_Interop
 
 ```
 require:
-    - cmis -> cmis 0.2
+    - cmis -> cmis 0.2.1
 
 repositories:
     - sismics:
