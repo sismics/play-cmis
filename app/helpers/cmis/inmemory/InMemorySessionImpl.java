@@ -30,7 +30,7 @@ public class InMemorySessionImpl implements Session {
     private OperationContext defaultContext;
 
     static {
-        if (play.test.Fixtures.idCache.get("objectByPathMap") != null) {
+        if (play.test.Fixtures.idCache.get("objectByPathMap") == null) {
             Logger.info("Initializing CMIS in-memory repository");
 
             Fixtures.idCache.put("objectByPathMap", new HashMap<String, CmisObject>());
