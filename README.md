@@ -10,12 +10,12 @@ This plugin adds [CMIS](https://en.wikipedia.org/wiki/Content_Management_Interop
 
 ```
 require:
-    - cmis -> cmis 0.2.2
+    - cmis -> cmis 1.0.0
 
 repositories:
-    - sismics:
-        type:       http
-        artifact:   "http://release.sismics.com/repo/play/[module]-[revision].zip"
+    - sismicsNexusRaw:
+        type: http
+        artifact: "https://nexus.sismics.com/repository/sismics/[module]-[revision].zip"
         contains:
             - cmis -> *
 
