@@ -1,4 +1,6 @@
 ## Change Log
+### Version 1.1.0 (2020-12-28)
+- Deploy using Github Action
 ### Version 1.0.1 (2019-04-05)
 - Add missing dependencies
 ### Version 1.0.0 (2019-04-05)

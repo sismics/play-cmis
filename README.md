@@ -1,3 +1,6 @@
+[![GitHub release](https://img.shields.io/github/release/sismics/play-cmis.svg?style=flat-square)](https://github.com/sismics/play-cmis/releases/latest)
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+
 # play-cmis plugin
 
 This plugin adds [CMIS](https://en.wikipedia.org/wiki/Content_Management_Interoperability_Services) support to Play! Framework 1 applications.
@@ -10,7 +13,7 @@ This plugin adds [CMIS](https://en.wikipedia.org/wiki/Content_Management_Interop
 
 ```
 require:
-    - cmis -> cmis 1.0.1
+    - cmis -> cmis 1.1.0
 
 repositories:
     - sismicsNexusRaw:
